@@ -12,7 +12,8 @@ const app = createApp(App)
 app.use(router)
 
 app.use(Inkline, {
-    components
+    components,
+    colorMode: 'light'
 })
 
 app.mount('#app')
