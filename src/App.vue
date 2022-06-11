@@ -44,14 +44,18 @@ export default {
 <template>
   <div class="_height:100% _display:flex _flex-direction:column">
     <i-nav class="_display:flex _justify-content:space-between">
-      <i-nav-item href="https://inkline.io">
+      <i-nav-item href="/">
         <img height="40" src="@/logo.svg">
-        <span class="ml-2">Document Validation Playground</span>
+        <span
+          class="_margin-left:1 _font-size:lg"
+          style="font-family: Xolonium;"
+        >Document Validation Playground</span>
       </i-nav-item>
       <i-nav>
-        <i-nav-item href="https://www.byteplug.io/standards/json-validator">Learn</i-nav-item>
-        <i-nav-item href="https://www.byteplug.io/standards/json-validator/document">Rules</i-nav-item>
-        <i-nav-item href="https://www.byteplug.io/standards/json-validator/toolkit">Toolkit</i-nav-item>
+        <i-nav-item
+          href="https://www.byteplug.io/standards/document-validator"
+          class="_margin-right:1"
+        >Website</i-nav-item>
       </i-nav>
     </i-nav>
     <div class="_flex-grow:1">
@@ -131,7 +135,7 @@ export default {
         </svg>
       </div>
       <div class="_margin-bottom:2">
-        <img src="@/assets/logo.svg" height="60" alt="">
+        <img src="@/logo.svg" height="60" alt="">
       </div>
       <div class="_flex-grow:1">
         <svg height="60" width="100%">
@@ -145,6 +149,11 @@ export default {
 <style>
 html, body, #app {
   height: 100%;
+}
+
+@font-face {
+  font-family: "Xolonium";
+  src: local("Xolonium"), url(./fonts/Xolonium/Xolonium-Regular.ttf) format("truetype");
 }
 
 .textarea-full-height div {
