@@ -9,7 +9,7 @@ export default {
     <i-nav class="_display:flex _justify-content:space-between">
       <i-nav-item href="https://inkline.io">
         <img height="40" src="@/assets/logo.svg">
-        <span class="ml-2">Byteplug JSON Validator</span>
+        <span class="ml-2">Document Validation Playground</span>
       </i-nav-item>
       <i-nav>
         <i-nav-item href="https://www.byteplug.io/standards/json-validator">Learn</i-nav-item>
