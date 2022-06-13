@@ -30,12 +30,80 @@ const right = `\
 }
 `
 
+import Warnings from '@/Warnings.vue'
+import Errors from '@/Errors.vue'
+
 export default {
   name: 'App',
+  components: {
+    Warnings,
+    Errors
+  },
   data() {
     return {
-      foo: left,
-      bar: right
+      specs: {
+        value: left,
+        warnings: ["foo", "bar"],
+        errors: [],
+        timer: null
+      },
+      document: {
+        value: right,
+        warnings: [],
+        errors: [],
+        timer: null
+      }
+    }
+  },
+  methods: {
+    parseSpecs() {
+      console.log("parse specs...")
+
+      const body = {
+        specs: this.specs.value
+      }
+
+      this.axios.post('/validator/parse-specs', body)
+        .then((response) => {
+          this.specs.warnings = response.data.warnings
+          this.specs.errors = response.data.errors
+
+          console.log("[POST] /validator/parse-specs -- OK")
+        })
+        .catch((error) => {
+          console.log("[POST] /validator/parse-specs -- Error")
+        })
+    },
+    parseDocument() {
+      console.log("parse document...")
+
+      const body = {
+        document: this.document.value
+      }
+
+      this.axios.post('/validator/parse-document', body)
+        .then((response) => {
+          this.document.warnings = response.data.warnings
+          this.document.errors = response.data.errors
+
+          console.log("[POST] /validator/parse-document -- OK")
+        })
+        .catch((error) => {
+          console.log("[POST] /validator/parse-document -- Error")
+        })
+    },
+    validateDocument() {
+      console.log("validate document...")
+    }
+  },
+  watch: {
+    'specs.value'(value) {
+      clearTimeout(this.specs.timer)
+      this.specs.timer = setTimeout(this.parseSpecs, 3000);
+    },
+    'document.value'(value) {
+      clearTimeout(this.document.timer)
+      this.document.timer = setTimeout(this.parseDocument, 3000);
     }
   }
 }
@@ -78,13 +146,13 @@ export default {
                 YAML Specs
               </div>
               <div>
-                0 <i-icon name="ink-warning" class="_color:warning" />
-                0 <i-icon name="ink-danger" class="_color:danger" />
+                <warnings :warnings="specs.warnings"/>
+                <errors :errors="specs.errors"/>
               </div>
             </div>
             <div class="_background:white _flex-grow:1 textarea-full-height">
               <i-textarea
-                v-model="foo"
+                v-model="specs.value"
                 placeholder="Type something.."
               />
             </div>
@@ -98,13 +166,13 @@ export default {
                 JSON Document
               </div>
               <div>
-                0 <i-icon name="ink-warning" class="_color:warning" />
-                0 <i-icon name="ink-danger" class="_color:danger" />
+                <warnings :warnings="document.warnings"/>
+                <errors :errors="document.errors"/>
               </div>
             </div>
             <div class="_background:white _flex-grow:1 textarea-full-height">
               <i-textarea
-                v-model="bar"
+                v-model="document.value"
                 placeholder="Type something.."
               />
             </div>
