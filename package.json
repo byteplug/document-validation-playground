@@ -8,9 +8,14 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@codemirror/lang-json": "^6.0.0",
+    "@codemirror/legacy-modes": "^6.1.0",
+    "@codemirror/stream-parser": "^0.19.9",
     "@inkline/inkline": "^3.0.9",
     "axios": "^0.27.2",
+    "codemirror": "^6.0.1",
     "vue": "^3.2.36",
+    "vue-codemirror": "^6.0.0",
     "vue-router": "^4.0.15"
   },
   "devDependencies": {

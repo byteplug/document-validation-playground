@@ -30,20 +30,34 @@ const right = `\
 }
 `
 
+import { StreamLanguage } from "@codemirror/language"
+import { json } from '@codemirror/lang-json'
+import { yaml } from "@codemirror/legacy-modes/mode/yaml"
+import { Codemirror } from 'vue-codemirror'
 import Warnings from '@/Warnings.vue'
 import Errors from '@/Errors.vue'
 
 export default {
   name: 'App',
   components: {
+    Codemirror,
     Warnings,
     Errors
+  },
+  setup() {
+    const yamlExtensions = [StreamLanguage.define(yaml)]
+    const jsonExtensions = [json()]
+
+    return {
+      yamlExtensions,
+      jsonExtensions
+    }
   },
   data() {
     return {
       specs: {
         value: left,
-        warnings: ["foo", "bar"],
+        warnings: [],
         errors: [],
         timer: null
       },
@@ -150,10 +164,14 @@ export default {
                 <errors :errors="specs.errors"/>
               </div>
             </div>
-            <div class="_background:white _flex-grow:1 textarea-full-height">
-              <i-textarea
+            <div class="_background:white _flex-grow:1">
+              <codemirror
                 v-model="specs.value"
-                placeholder="Type something.."
+                :style="{ height: '100%' }"
+                :autofocus="true"
+                :indent-with-tab="true"
+                :tab-size="2"
+                :extensions="yamlExtensions"
               />
             </div>
           </i-column>
@@ -170,10 +188,14 @@ export default {
                 <errors :errors="document.errors"/>
               </div>
             </div>
-            <div class="_background:white _flex-grow:1 textarea-full-height">
-              <i-textarea
+            <div class="_background:white _flex-grow:1">
+              <codemirror
                 v-model="document.value"
-                placeholder="Type something.."
+                :style="{ height: '100%' }"
+                :autofocus="true"
+                :indent-with-tab="true"
+                :tab-size="2"
+                :extensions="jsonExtensions"
               />
             </div>
           </i-column>
@@ -222,18 +244,5 @@ html, body, #app {
 @font-face {
   font-family: "Xolonium";
   src: local("Xolonium"), url(./fonts/Xolonium/Xolonium-Regular.ttf) format("truetype");
-}
-
-.textarea-full-height div {
-  height:100%;
-}
-
-.textarea-full-height div div {
-  height:100%;
-}
-
-.textarea-full-height div div textarea{
-  height:100%;
-  resize: none;
 }
 </style>
