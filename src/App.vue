@@ -182,7 +182,7 @@ export default {
         <span
           class="_margin-left:1 _font-size:lg"
           style="font-family: Xolonium;"
-        >Document Validation Playground</span>
+        >Validation Playground</span>
       </i-nav-item>
       <i-nav>
         <i-nav-item
@@ -194,11 +194,11 @@ export default {
     <div class="_flex-grow:1">
       <i-container class="_height:100% _display:flex _flex-direction:column">
         <div class="_width:75%">
-          <h3>JSON Validation Playground</h3>
+          <h4>JSON Document Validator</h4>
           <div class="_margin-bottom:3">
-  Toy around with Byteplug JSON Validator Standard. On the left, enter the YAML
-  specifications of a JSON document, and on the right see how it validates (or
-  invalidates) them.
+Toy around with the Document Validator standard. On the left you enter the YAML
+specifications of your JSON document, and on the right see how it validates (or
+invalidates) them.
           </div>
         </div>
         <i-row class="_flex-grow:1">
