@@ -1,0 +1,6 @@
+type: tuple
+values:
+  - type: flag
+  - type: integer
+  - type: string
+option: false

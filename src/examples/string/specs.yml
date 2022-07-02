@@ -1,0 +1,5 @@
+type: string
+length:
+  maximum: 42
+pattern: "^[a-z]+(-[a-z]+)*$"
+option: false

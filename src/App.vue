@@ -1,34 +1,26 @@
 <script>
-const left = `\
-type: map
-fields:
-  email:
-    type: email
-  password:
-    type: string
-    regex: foobar
-  status:
-    type: enum
-    values: ['pending', 'active', 'deleted']
-    default: 'pending'
-  name:
-    type: string
-    length: [2, 40]
-    option: true
-  hobbies:
-    type: array
-    value:
-      type: string
-`
+import flagSpecs       from '@/examples/flag/specs.yml?raw'
+import flagDocument    from '@/examples/flag/document.json?raw'
+import integerSpecs    from '@/examples/integer/specs.yml?raw'
+import integerDocument from '@/examples/integer/document.json?raw'
+import decimalSpecs    from '@/examples/decimal/specs.yml?raw'
+import decimalDocument from '@/examples/decimal/document.json?raw'
+import stringSpecs     from '@/examples/string/specs.yml?raw'
+import stringDocument  from '@/examples/string/document.json?raw'
+import enumSpecs       from '@/examples/enum/specs.yml?raw'
+import enumDocument    from '@/examples/enum/document.json?raw'
 
-const right = `\
-{
-  "email": "john.doe@gmail.com",
-  "password": "1234abcd",
-  "status": "active",
-  "hobbies": ["Soccer", "Badminton", "Movies"]
-}
-`
+import listSpecs     from '@/examples/list/specs.yml?raw'
+import listDocument  from '@/examples/list/document.json?raw'
+import tupleSpecs    from '@/examples/tuple/specs.yml?raw'
+import tupleDocument from '@/examples/tuple/document.json?raw'
+import mapSpecs      from '@/examples/map/specs.yml?raw'
+import mapDocument   from '@/examples/map/document.json?raw'
+
+import userSpecs           from '@/examples/user/specs.yml?raw'
+import userDocument        from '@/examples/user/document.json?raw'
+import fancyBinarySpecs    from '@/examples/fancy-binary/specs.yml?raw'
+import fancyBinaryDocument from '@/examples/fancy-binary/document.json?raw'
 
 import { StreamLanguage } from "@codemirror/language"
 import { json } from '@codemirror/lang-json'
@@ -56,20 +48,79 @@ export default {
   data() {
     return {
       specs: {
-        value: left,
+        value: userSpecs,
         warnings: [],
         errors: [],
         timer: null
       },
       document: {
-        value: right,
+        value: userDocument,
         warnings: [],
         errors: [],
         timer: null
-      }
+      },
+      examples: {
+        'flag': {
+          name: "Flag",
+          specs: flagSpecs,
+          document: flagDocument
+        },
+        'integer': {
+          name: "Integer",
+          specs: integerSpecs,
+          document: integerDocument
+        },
+        'decimal': {
+          name: "Decimal",
+          specs: decimalSpecs,
+          document: decimalDocument
+        },
+        'string': {
+          name: "String",
+          specs: stringSpecs,
+          document: stringDocument
+        },
+        'enum': {
+          name: "Enum",
+          specs: enumSpecs,
+          document: enumDocument
+        },
+        'list': {
+          name: "List",
+          specs: listSpecs,
+          document: listDocument
+        },
+        'tuple': {
+          name: "Tuple",
+          specs: tupleSpecs,
+          document: tupleDocument
+        },
+        'map': {
+          name: "Map",
+          specs: mapSpecs,
+          document: mapDocument
+        },
+        'user': {
+          name: "User",
+          specs: userSpecs,
+          document: userDocument
+        },
+        'fancy-binary': {
+          name: "Fancy Binary",
+          specs: fancyBinarySpecs,
+          document: fancyBinaryDocument
+        }
+      },
+      fundamentalExamples: ['flag', 'integer', 'decimal', 'string', 'enum'],
+      compositeExamples: ['list', 'tuple', 'map'],
+      concreteExamples: ['user', 'fancy-binary'],
     }
   },
   methods: {
+    setExample(example) {
+      this.specs.value = this.examples[example].specs
+      this.document.value = this.examples[example].document
+    },
     parseSpecs() {
       console.log("parse specs...")
 
@@ -204,11 +255,26 @@ export default {
           <i-dropdown size="sm">
             <i-button>Examples</i-button>
             <template #body>
-              <i-dropdown-item>Action</i-dropdown-item>
-              <i-dropdown-item>Another action</i-dropdown-item>
-              <i-dropdown-item disabled>Disabled action</i-dropdown-item>
+              <i-dropdown-item
+                v-for="example in fundamentalExamples"
+                :key="example"
+                @click="setExample(example)"
+              >{{ examples[example].name }}
+              </i-dropdown-item>
               <i-dropdown-divider />
-              <i-dropdown-item>Separated item</i-dropdown-item>
+              <i-dropdown-item
+                v-for="example in compositeExamples"
+                :key="example"
+                @click="setExample(example)"
+              >{{ examples[example].name }}
+              </i-dropdown-item>
+              <i-dropdown-divider />
+              <i-dropdown-item
+                v-for="example in concreteExamples"
+                :key="example"
+                @click="setExample(example)"
+              >{{ examples[example].name }}
+              </i-dropdown-item>
             </template>
           </i-dropdown>
           <div class="_display:flex">

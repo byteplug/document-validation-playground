@@ -1,0 +1,23 @@
+type: map
+fields:
+  email:
+    type: string
+    pattern: "foobar"
+  password:
+    type: string
+    length:
+      minimum: 8
+      maximum: 16
+  status:
+    type: enum
+    values: ['pending', 'active', 'deleted']
+  name:
+    type: string
+    length:
+      minimum: 2
+      maximum: 40
+    option: true
+  hobbies:
+    type: list
+    value:
+      type: string

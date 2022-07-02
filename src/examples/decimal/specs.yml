@@ -1,0 +1,6 @@
+type: decimal
+minimum:
+  exclusive: true
+  value: 10.5
+maximum: 42
+option: false

@@ -1,0 +1,9 @@
+type: map
+fields:
+  foo:
+    type: flag
+  bar:
+    type: integer
+  quz:
+    type: string
+option: false

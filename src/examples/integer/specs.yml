@@ -1,0 +1,6 @@
+type: integer
+minimum:
+  exclusive: true
+  value: 10
+maximum: 42
+option: false

@@ -1,0 +1,8 @@
+type: list
+value:
+  type: integer
+  minimum: 10
+  maximum: 100
+length:
+  minimum: 2
+option: false

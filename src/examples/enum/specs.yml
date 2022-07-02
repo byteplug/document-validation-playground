@@ -1,0 +1,3 @@
+type: enum
+values: [foo, bar, quz]
+option: false
