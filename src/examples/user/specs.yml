@@ -2,7 +2,7 @@ type: map
 fields:
   email:
     type: string
-    pattern: "foobar"
+    pattern: ^[^@]+@[^@]+\.[^@]+$
   password:
     type: string
     length:
