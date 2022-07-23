@@ -1,35 +1,12 @@
-# byteplug-json-validator
+# Document Validation Playground
 
-This template should help get you started developing with Vue 3 in Vite.
+This is a playground to toy around with the *Document Validator* standard
+developed by Byteplug. It's accessible at https://validator.byteplug.io/ and
+the source code is released under the MIT license.
 
-## Recommended IDE Setup
+Developed by Jonathan De Wachter (jonathan.dewachter@byteplug.io).
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+## More infos
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+It's a web front-end that lets you input your YAML specs and JSON documents in
+order to see how it validates or invalidates them.
