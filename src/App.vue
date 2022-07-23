@@ -17,10 +17,10 @@ import tupleDocument from '@/examples/tuple/document.json?raw'
 import mapSpecs      from '@/examples/map/specs.yml?raw'
 import mapDocument   from '@/examples/map/document.json?raw'
 
-import userSpecs           from '@/examples/user/specs.yml?raw'
-import userDocument        from '@/examples/user/document.json?raw'
-import fancyBinarySpecs    from '@/examples/fancy-binary/specs.yml?raw'
-import fancyBinaryDocument from '@/examples/fancy-binary/document.json?raw'
+import userSpecs         from '@/examples/user/specs.yml?raw'
+import userDocument      from '@/examples/user/document.json?raw'
+import fancyByteSpecs    from '@/examples/fancy-byte/specs.yml?raw'
+import fancyByteDocument from '@/examples/fancy-byte/document.json?raw'
 
 import { StreamLanguage } from "@codemirror/language"
 import { json } from '@codemirror/lang-json'
@@ -105,15 +105,15 @@ export default {
           specs: userSpecs,
           document: userDocument
         },
-        'fancy-binary': {
-          name: "Fancy Binary",
-          specs: fancyBinarySpecs,
-          document: fancyBinaryDocument
+        'fancy-byte': {
+          name: "Fancy Byte",
+          specs: fancyByteSpecs,
+          document: fancyByteDocument
         }
       },
       fundamentalExamples: ['flag', 'integer', 'decimal', 'string', 'enum'],
       compositeExamples: ['list', 'tuple', 'map'],
-      concreteExamples: ['user', 'fancy-binary'],
+      concreteExamples: ['user', 'fancy-byte'],
     }
   },
   methods: {

@@ -1,4 +1,5 @@
 type: list
 value:
   type: flag
+length: 8
 option: false
