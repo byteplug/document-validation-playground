@@ -59,6 +59,7 @@ export default {
         errors: [],
         timer: null
       },
+      dynamicValidation: false,
       examples: {
         'flag': {
           name: "Flag",
@@ -188,8 +189,10 @@ export default {
       this.specs.timer = setTimeout(this.validateSpecs, 3000);
     },
     'document.value'(value) {
-      // clearTimeout(this.document.timer)
-      // this.document.timer = setTimeout(this.validateDocument, 3000);
+      if (this.dynamicValidation) {
+        clearTimeout(this.document.timer)
+        this.document.timer = setTimeout(this.validateDocument, 3000);
+      }
     }
   }
 }
@@ -299,7 +302,7 @@ invalidates) them.
             </template>
           </i-dropdown>
           <div class="_display:flex">
-            <i-toggle v-model="toggled" disabled>Enable dynamic validation</i-toggle>
+            <i-toggle v-model="dynamicValidation">Enable dynamic validation</i-toggle>
             <i-button class="_margin-left:1" color="primary" @click="validateDocument">Validate</i-button>
           </div>
         </div>
