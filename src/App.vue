@@ -121,54 +121,75 @@ export default {
       this.specs.value = this.examples[example].specs
       this.document.value = this.examples[example].document
     },
-    parseSpecs() {
-      console.log("parse specs...")
+    validateSpecs() {
+      console.log("validate specs...")
 
       const body = {
         specs: this.specs.value
       }
 
-      this.axios.post('/validator/parse-specs', body)
+      this.axios.post('/validator/validate-specs', body)
         .then((response) => {
+          // TODO; Handle when response is 'invalid-yaml-specs'
+          // if (response == "invalid-yaml-specs")
+
           this.specs.warnings = response.data.warnings
           this.specs.errors = response.data.errors
 
-          console.log("[POST] /validator/parse-specs -- OK")
+          console.log("[POST] /validator/validate-specs -- OK")
         })
         .catch((error) => {
-          console.log("[POST] /validator/parse-specs -- Error")
+          console.log("[POST] /validator/validate-specs -- Error")
         })
-    },
-    parseDocument() {
-      console.log("parse document...")
 
-      const body = {
-        document: this.document.value
-      }
-
-      this.axios.post('/validator/parse-document', body)
-        .then((response) => {
-          this.document.warnings = response.data.warnings
-          this.document.errors = response.data.errors
-
-          console.log("[POST] /validator/parse-document -- OK")
-        })
-        .catch((error) => {
-          console.log("[POST] /validator/parse-document -- Error")
-        })
+      this.specs.timer = null
     },
     validateDocument() {
       console.log("validate document...")
+
+      if (!this.isSpecsValid) {
+        console.log("specs is not valid; abort early")
+        return
+      }
+
+      const body = {
+        specs: this.specs.value,
+        document: this.document.value
+      }
+
+      this.axios.post('/validator/validate-document', body)
+        .then((response) => {
+          // TODO; Handle when response is 'invalid-yaml-specs' and 'invalid-json-document'
+          // if (response == "invalid-yaml-specs")
+          // if (response == "invalid-json-document")
+
+          this.document.warnings = response.data.warnings
+          this.document.errors = response.data.errors
+
+          console.log("[POST] /validator/validate-document -- OK")
+        })
+        .catch((error) => {
+          console.log("[POST] /validator/validate-document -- Error")
+        })
+
+      this.document.timer = null
+    }
+  },
+  computed: {
+    isSpecsValid: function() {
+      // We want to disable the validate button when the specs is not valid (we
+      // cannot validate a document with an invalid specs).
+      return this.specs.errors.length == 0 && this.specs.timer == null
     }
   },
   watch: {
     'specs.value'(value) {
       clearTimeout(this.specs.timer)
-      this.specs.timer = setTimeout(this.parseSpecs, 3000);
+      this.specs.timer = setTimeout(this.validateSpecs, 3000);
     },
     'document.value'(value) {
-      clearTimeout(this.document.timer)
-      this.document.timer = setTimeout(this.parseDocument, 3000);
+      // clearTimeout(this.document.timer)
+      // this.document.timer = setTimeout(this.validateDocument, 3000);
     }
   }
 }
@@ -278,8 +299,8 @@ invalidates) them.
             </template>
           </i-dropdown>
           <div class="_display:flex">
-            <i-toggle v-model="toggled">Enable dynamic validation</i-toggle>
-            <i-button class="_margin-left:1" color="primary">Validate</i-button>
+            <i-toggle v-model="toggled" disabled>Enable dynamic validation</i-toggle>
+            <i-button class="_margin-left:1" color="primary" @click="validateDocument">Validate</i-button>
           </div>
         </div>
       </i-container>
