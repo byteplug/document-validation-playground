@@ -203,7 +203,7 @@ export default {
         <span
           class="_margin-left:1 _font-size:lg"
           style="font-family: Xolonium;"
-        >Validation Playground</span>
+        >Document Validation Playground</span>
       </i-nav-item>
       <i-nav>
         <i-nav-item
