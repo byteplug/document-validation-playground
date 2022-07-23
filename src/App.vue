@@ -303,7 +303,11 @@ invalidates) them.
           </i-dropdown>
           <div class="_display:flex">
             <i-toggle v-model="dynamicValidation">Enable dynamic validation</i-toggle>
-            <i-button class="_margin-left:1" color="primary" @click="validateDocument">Validate</i-button>
+            <i-button
+              class="_margin-left:1"
+              color="primary"
+              @click="validateDocument"
+              :disabled="!isSpecsValid">Validate</i-button>
           </div>
         </div>
       </i-container>
