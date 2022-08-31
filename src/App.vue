@@ -1,33 +1,24 @@
 <script>
-import flagSpecs       from '@/examples/flag/specs.yml?raw'
-import flagDocument    from '@/examples/flag/document.json?raw'
-import integerSpecs    from '@/examples/integer/specs.yml?raw'
-import integerDocument from '@/examples/integer/document.json?raw'
-import decimalSpecs    from '@/examples/decimal/specs.yml?raw'
-import decimalDocument from '@/examples/decimal/document.json?raw'
-import stringSpecs     from '@/examples/string/specs.yml?raw'
-import stringDocument  from '@/examples/string/document.json?raw'
-import enumSpecs       from '@/examples/enum/specs.yml?raw'
-import enumDocument    from '@/examples/enum/document.json?raw'
-
-import listSpecs     from '@/examples/list/specs.yml?raw'
-import listDocument  from '@/examples/list/document.json?raw'
-import tupleSpecs    from '@/examples/tuple/specs.yml?raw'
-import tupleDocument from '@/examples/tuple/document.json?raw'
-import mapSpecs      from '@/examples/map/specs.yml?raw'
-import mapDocument   from '@/examples/map/document.json?raw'
-
-import userSpecs         from '@/examples/user/specs.yml?raw'
-import userDocument      from '@/examples/user/document.json?raw'
-import fancyByteSpecs    from '@/examples/fancy-byte/specs.yml?raw'
-import fancyByteDocument from '@/examples/fancy-byte/document.json?raw'
-
+import YAML from 'yaml'
+import { validateSpecs, documentToObject } from '@byteplug/document'
 import { StreamLanguage } from "@codemirror/language"
 import { json } from '@codemirror/lang-json'
 import { yaml } from "@codemirror/legacy-modes/mode/yaml"
 import { Codemirror } from 'vue-codemirror'
+
+import metadata from '@/metadata.yml?raw'
 import Warnings from '@/Warnings.vue'
 import Errors from '@/Errors.vue'
+
+function formatPaths(values) {
+  return values.map(value => {
+    var text = "root"
+    if (value.path.length > 0)
+      text = value.path.join('.')
+
+    return text + ": " + value.message
+  })
+}
 
 export default {
   name: 'App',
@@ -47,151 +38,113 @@ export default {
   },
   data() {
     return {
+      metadata: YAML.parse(metadata),
+
       specs: {
-        value: userSpecs,
-        warnings: [],
+        text: "",
+        value: undefined,
         errors: [],
+        warnings: [],
         timer: null
       },
       document: {
-        value: userDocument,
-        warnings: [],
+        text: "",
+        value: undefined,
         errors: [],
-        timer: null
+        warnings: [],
+        timer: 42
       },
-      dynamicValidation: false,
-      examples: {
-        'flag': {
-          name: "Flag",
-          specs: flagSpecs,
-          document: flagDocument
-        },
-        'integer': {
-          name: "Integer",
-          specs: integerSpecs,
-          document: integerDocument
-        },
-        'decimal': {
-          name: "Decimal",
-          specs: decimalSpecs,
-          document: decimalDocument
-        },
-        'string': {
-          name: "String",
-          specs: stringSpecs,
-          document: stringDocument
-        },
-        'enum': {
-          name: "Enum",
-          specs: enumSpecs,
-          document: enumDocument
-        },
-        'list': {
-          name: "List",
-          specs: listSpecs,
-          document: listDocument
-        },
-        'tuple': {
-          name: "Tuple",
-          specs: tupleSpecs,
-          document: tupleDocument
-        },
-        'map': {
-          name: "Map",
-          specs: mapSpecs,
-          document: mapDocument
-        },
-        'user': {
-          name: "User",
-          specs: userSpecs,
-          document: userDocument
-        },
-        'fancy-byte': {
-          name: "Fancy Byte",
-          specs: fancyByteSpecs,
-          document: fancyByteDocument
-        }
-      },
-      fundamentalExamples: ['flag', 'integer', 'decimal', 'string', 'enum'],
-      compositeExamples: ['list', 'tuple', 'map'],
-      concreteExamples: ['user', 'fancy-byte'],
+      dynamicValidation: false
     }
   },
   methods: {
-    setExample(example) {
-      this.specs.value = this.examples[example].specs
-      this.document.value = this.examples[example].document
+    setExample(type_) {
+      this.specs.text = this.metadata.types[type_].example.specs
+      this.document.text = this.metadata.types[type_].example.validDocument
     },
     validateSpecs() {
-      console.log("validate specs...")
+      try {
+        var object = YAML.parse(this.specs.text)
+      }
+      catch (err) {
+        console.log("Failed to parse the YAML string.")
 
-      const body = {
-        specs: this.specs.value
+        this.specs.value = undefined
+        this.specs.errors.length = 0
+        this.specs.errors.push("Syntax is invalid.")
+        this.specs.errors.warnings = 0
+        this.specs.timer = null
+
+        return
       }
 
-      this.axios.post('/validator/validate-specs', body)
-        .then((response) => {
-          // TODO; Handle when response is 'invalid-yaml-specs'
-          // if (response == "invalid-yaml-specs")
+      this.specs.value = object
 
-          this.specs.warnings = response.data.warnings
-          this.specs.errors = response.data.errors
+      var errors = []
+      var warnings = []
+      validateSpecs(object, errors, warnings)
 
-          console.log("[POST] /validator/validate-specs -- OK")
-        })
-        .catch((error) => {
-          console.log("[POST] /validator/validate-specs -- Error")
-        })
+      this.specs.errors = formatPaths(errors)
+      this.specs.warnings = formatPaths(warnings)
 
       this.specs.timer = null
     },
     validateDocument() {
-      console.log("validate document...")
+      if (this.specs.value === undefined)
+        return
 
-      if (!this.isSpecsValid) {
-        console.log("specs is not valid; abort early")
+      try {
+        var document = JSON.parse(this.document.text)
+      }
+      catch (err) {
+        console.log("Failed to parse the JSON string.")
+
+        this.document.value = undefined
+        this.document.errors.length = 0
+        this.document.errors.push("Syntax is invalid.")
+        this.document.errors.warnings = 0
+        this.document.timer = null
+
         return
       }
 
-      const body = {
-        specs: this.specs.value,
-        document: this.document.value
-      }
+      this.document.value = document
 
-      this.axios.post('/validator/validate-document', body)
-        .then((response) => {
-          // TODO; Handle when response is 'invalid-yaml-specs' and 'invalid-json-document'
-          // if (response == "invalid-yaml-specs")
-          // if (response == "invalid-json-document")
+      var errors = []
+      var warnings = []
+      // documentToObject(document, this.specs.value, errors, warnings)
+      documentToObject(this.document.text, this.specs.value, errors, warnings)
 
-          this.document.warnings = response.data.warnings
-          this.document.errors = response.data.errors
-
-          console.log("[POST] /validator/validate-document -- OK")
-        })
-        .catch((error) => {
-          console.log("[POST] /validator/validate-document -- Error")
-        })
+      this.document.errors = formatPaths(errors)
+      this.document.warnings = formatPaths(warnings)
 
       this.document.timer = null
     }
   },
   computed: {
-    isSpecsValid: function() {
-      // We want to disable the validate button when the specs is not valid (we
-      // cannot validate a document with an invalid specs).
-      return this.specs.errors.length == 0 && this.specs.timer == null
+    status() {
+      if (this.specs.timer !== null) {
+        return "pending"
+      }
+      else if (this.specs.errors.length > 0 || this.specs.warnings.length > 0) {
+        return "invalid"
+      }
+      else {
+        return "valid"
+      }
     }
   },
   watch: {
-    'specs.value'(value) {
+    'specs.text'(value) {
       clearTimeout(this.specs.timer)
-      this.specs.timer = setTimeout(this.validateSpecs, 3000);
+      this.specs.timer = setTimeout(this.validateSpecs, 50)
+
+      this.document.timer = 42
     },
-    'document.value'(value) {
+    'document.text'(value) {
       if (this.dynamicValidation) {
         clearTimeout(this.document.timer)
-        this.document.timer = setTimeout(this.validateDocument, 3000);
+        this.document.timer = setTimeout(this.validateDocument, 50)
       }
     }
   }
@@ -200,21 +153,15 @@ export default {
 
 <template>
   <div class="_height:100% _display:flex _flex-direction:column">
-    <i-nav class="_display:flex _justify-content:space-between">
-      <i-nav-item href="/">
-        <img height="40" src="@/logo.svg">
-        <span
-          class="_margin-left:1 _font-size:lg"
-          style="font-family: Xolonium;"
-        >Document Validation Playground</span>
-      </i-nav-item>
-      <i-nav>
-        <i-nav-item
-          href="https://www.byteplug.io/standards/document-validator"
-          class="_margin-right:1"
-        >Website</i-nav-item>
-      </i-nav>
+    <i-container>
+    <i-nav class="_display:flex _justify-content:end">
+      <i-nav-item
+        href="https://www.byteplug.io/standards/document-validator"
+        class="_margin-right:1"
+      >Official Website</i-nav-item>
     </i-nav>
+
+    </i-container>
     <div class="_flex-grow:1">
       <i-container class="_height:100% _display:flex _flex-direction:column">
         <div class="_width:75%">
@@ -234,14 +181,14 @@ invalidates) them.
               <div class="_font-weight:bold _font-size:lg _margin-bottom:1">
                 YAML Specs
               </div>
-              <div>
+              <div v-if="status === 'invalid'">
                 <warnings :warnings="specs.warnings"/>
                 <errors :errors="specs.errors"/>
               </div>
             </div>
             <div class="_background:white _flex-grow:1">
               <codemirror
-                v-model="specs.value"
+                v-model="specs.text"
                 :style="{ height: '100%' }"
                 :autofocus="true"
                 :indent-with-tab="true"
@@ -258,14 +205,20 @@ invalidates) them.
               <div class="_font-weight:bold _font-size:lg _margin-bottom:1">
                 JSON Document
               </div>
-              <div>
-                <warnings :warnings="document.warnings"/>
-                <errors :errors="document.errors"/>
+              <div v-if="status === 'valid'">
+                <div v-if="document.timer != null"></div>
+                <div v-else-if="document.errors.length > 0 || document.warnings.length > 0">
+                  <warnings :warnings="document.warnings"/>
+                  <errors :errors="document.errors"/>
+                </div>
+                <div v-else>
+                  <i-icon name="ink-check" class="_color:success" />
+                </div>
               </div>
             </div>
             <div class="_background:white _flex-grow:1">
               <codemirror
-                v-model="document.value"
+                v-model="document.text"
                 :style="{ height: '100%' }"
                 :autofocus="true"
                 :indent-with-tab="true"
@@ -280,24 +233,24 @@ invalidates) them.
             <i-button>Examples</i-button>
             <template #body>
               <i-dropdown-item
-                v-for="example in fundamentalExamples"
-                :key="example"
-                @click="setExample(example)"
-              >{{ examples[example].name }}
+                v-for="type_ in metadata.categories.fundamental.types"
+                :key="type_"
+                @click="setExample(type_)"
+              >{{ metadata.types[type_].name }}
               </i-dropdown-item>
               <i-dropdown-divider />
               <i-dropdown-item
-                v-for="example in compositeExamples"
-                :key="example"
-                @click="setExample(example)"
-              >{{ examples[example].name }}
+                v-for="type_ in metadata.categories.composite.types"
+                :key="type_"
+                @click="setExample(type_)"
+              >{{ metadata.types[type_].name }}
               </i-dropdown-item>
               <i-dropdown-divider />
               <i-dropdown-item
-                v-for="example in concreteExamples"
-                :key="example"
-                @click="setExample(example)"
-              >{{ examples[example].name }}
+                v-for="type_ in metadata.categories.extra.types"
+                :key="type_"
+                @click="setExample(type_)"
+              >{{ metadata.types[type_].name }}
               </i-dropdown-item>
             </template>
           </i-dropdown>
@@ -307,7 +260,7 @@ invalidates) them.
               class="_margin-left:1"
               color="primary"
               @click="validateDocument"
-              :disabled="!isSpecsValid">Validate</i-button>
+              :disabled="status !== 'valid'">Validate</i-button>
           </div>
         </div>
       </i-container>
