@@ -147,6 +147,9 @@ export default {
         this.document.timer = setTimeout(this.validateDocument, 50)
       }
     }
+  },
+  mounted() {
+    this.setExample('number')
   }
 }
 </script>
