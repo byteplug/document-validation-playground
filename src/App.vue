@@ -142,6 +142,8 @@ export default {
       this.document.timer = 42
     },
     'document.text'(value) {
+      this.document.timer = 42
+
       if (this.dynamicValidation) {
         clearTimeout(this.document.timer)
         this.document.timer = setTimeout(this.validateDocument, 50)
