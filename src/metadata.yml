@@ -34,12 +34,12 @@ types:
       implemented with the JSON boolean type and has no notable particular
       behavior.
     example:
-      specs: |
+      format: |
         type: flag
         option: false
-      validDocument: |
+      validPayload: |
         true
-      invalidDocument: |
+      invalidPayload: |
         1
   number:
     name: Number
@@ -49,7 +49,7 @@ types:
       false. You can also specify a valid range. It's implemented with the JSON
       number.
     example:
-      specs: |
+      format: |
         type: number
         decimal: false
         minimum:
@@ -57,9 +57,9 @@ types:
           value: 10.5
         maximum: 42
         option: false
-      validDocument: |
+      validPayload: |
         42
-      invalidDocument: |
+      invalidPayload: |
         42.5
   string:
     name: String
@@ -69,15 +69,15 @@ types:
       can restrict the character count and a pattern with a regex. It's
       implemented with the JSON string.
     example:
-      specs: |
+      format: |
         type: string
         length:
           maximum: 42
         pattern: "^[a-z]+(-[a-z]+)*$"
         option: false
-      validDocument: |
+      validPayload: |
         "hello-world"
-      invalidDocument: |
+      invalidPayload: |
         "Hello world!"
   array:
     name: Array
@@ -87,7 +87,7 @@ types:
 
       Note that the tuple type provides an array-like alternative.
     example:
-      specs: |
+      format: |
         type: array
         value:
           type: number
@@ -96,9 +96,9 @@ types:
         length:
           minimum: 2
         option: false
-      validDocument: |
+      validPayload: |
         [42, 24.5, 50.0, 23, 100]
-      invalidDocument: |
+      invalidPayload: |
         [42]
   object:
     name: Object
@@ -109,7 +109,7 @@ types:
 
       Note that the map type provides an object-like alternative.
     example:
-      specs: |
+      format: |
         type: object
         key: integer
         value:
@@ -117,12 +117,12 @@ types:
         length:
           maximum: 3
         option: false
-      validDocument: |
+      validPayload: |
         {
           "25": "Pikachu",
           "42": "Golbat"
         }
-      invalidDocument: |
+      invalidPayload: |
         {
           "pikachu": "Pikachu",
           "gobalt": "Golbat"
@@ -134,16 +134,16 @@ types:
       the type of the values it contains are strictly defined in advance. It's
       implemented with the JSON array.
     example:
-      specs: |
+      format: |
         type: tuple
         items:
           - type: flag
           - type: number
           - type: string
         option: false
-      validDocument: |
+      validPayload: |
         [false, 42, "Hello world!"]
-      invalidDocument: |
+      invalidPayload: |
         ["Hello world!", false, 42]
   map:
     name: Map
@@ -153,7 +153,7 @@ types:
       one of its field is marked as optional, its value can be omitted and to
       be interpreted as null. It's implemented with the JSON object.
     example:
-      specs: |
+      format: |
         type: map
         fields:
           foo:
@@ -164,12 +164,12 @@ types:
           quz:
             type: string
         option: false
-      validDocument: |
+      validPayload: |
         {
             "foo": false,
             "quz": "Hello world!"
         }
-      invalidDocument: |
+      invalidPayload: |
         {
             "quz": false,
             "foo": "Hello world!"
@@ -180,11 +180,11 @@ types:
       The enum type is set a of valid string values. It's implemented with a
       JSON string.
     example:
-      specs: |
+      format: |
         type: enum
         values: [foo, bar, quz]
         option: false
-      validDocument: |
+      validPayload: |
         "quz"
-      invalidDocument: |
+      invalidPayload: |
         "yolo"

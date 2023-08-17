@@ -1,6 +1,6 @@
 <script>
 import YAML from 'yaml'
-import { validateSpecs, documentToObject } from '@byteplug/document'
+import { validateFormat, payloadToObject } from '@byteplug/payload'
 import { StreamLanguage } from "@codemirror/language"
 import { json } from '@codemirror/lang-json'
 import { yaml } from "@codemirror/legacy-modes/mode/yaml"
@@ -40,14 +40,14 @@ export default {
     return {
       metadata: YAML.parse(metadata),
 
-      specs: {
+      format: {
         text: "",
         value: undefined,
         errors: [],
         warnings: [],
         timer: null
       },
-      document: {
+      payload: {
         text: "",
         value: undefined,
         errors: [],
@@ -59,74 +59,74 @@ export default {
   },
   methods: {
     setExample(type_) {
-      this.specs.text = this.metadata.types[type_].example.specs
-      this.document.text = this.metadata.types[type_].example.validDocument
+      this.format.text = this.metadata.types[type_].example.format
+      this.payload.text = this.metadata.types[type_].example.validPayload
     },
-    validateSpecs() {
+    validateFormat() {
       try {
-        var object = YAML.parse(this.specs.text)
+        var object = YAML.parse(this.format.text)
       }
       catch (err) {
         console.log("Failed to parse the YAML string.")
 
-        this.specs.value = undefined
-        this.specs.errors.length = 0
-        this.specs.errors.push("Syntax is invalid.")
-        this.specs.errors.warnings = 0
-        this.specs.timer = null
+        this.format.value = undefined
+        this.format.errors.length = 0
+        this.format.errors.push("Syntax is invalid.")
+        this.format.errors.warnings = 0
+        this.format.timer = null
 
         return
       }
 
-      this.specs.value = object
+      this.format.value = object
 
       var errors = []
       var warnings = []
-      validateSpecs(object, errors, warnings)
+      validateFormat(object, errors, warnings)
 
-      this.specs.errors = formatPaths(errors)
-      this.specs.warnings = formatPaths(warnings)
+      this.format.errors = formatPaths(errors)
+      this.format.warnings = formatPaths(warnings)
 
-      this.specs.timer = null
+      this.format.timer = null
     },
     validateDocument() {
-      if (this.specs.value === undefined)
+      if (this.format.value === undefined)
         return
 
       try {
-        var document = JSON.parse(this.document.text)
+        var payload = JSON.parse(this.payload.text)
       }
       catch (err) {
         console.log("Failed to parse the JSON string.")
 
-        this.document.value = undefined
-        this.document.errors.length = 0
-        this.document.errors.push("Syntax is invalid.")
-        this.document.errors.warnings = 0
-        this.document.timer = null
+        this.payload.value = undefined
+        this.payload.errors.length = 0
+        this.payload.errors.push("Syntax is invalid.")
+        this.payload.errors.warnings = 0
+        this.payload.timer = null
 
         return
       }
 
-      this.document.value = document
+      this.payload.value = payload
 
       var errors = []
       var warnings = []
-      // documentToObject(document, this.specs.value, errors, warnings)
-      documentToObject(this.document.text, this.specs.value, errors, warnings)
+      // payloadToObject(payload, this.format.value, errors, warnings)
+      payloadToObject(this.payload.text, this.format.value, errors, warnings)
 
-      this.document.errors = formatPaths(errors)
-      this.document.warnings = formatPaths(warnings)
+      this.payload.errors = formatPaths(errors)
+      this.payload.warnings = formatPaths(warnings)
 
-      this.document.timer = null
+      this.payload.timer = null
     }
   },
   computed: {
     status() {
-      if (this.specs.timer !== null) {
+      if (this.format.timer !== null) {
         return "pending"
       }
-      else if (this.specs.errors.length > 0 || this.specs.warnings.length > 0) {
+      else if (this.format.errors.length > 0 || this.format.warnings.length > 0) {
         return "invalid"
       }
       else {
@@ -135,18 +135,18 @@ export default {
     }
   },
   watch: {
-    'specs.text'(value) {
-      clearTimeout(this.specs.timer)
-      this.specs.timer = setTimeout(this.validateSpecs, 50)
+    'format.text'(value) {
+      clearTimeout(this.format.timer)
+      this.format.timer = setTimeout(this.validateFormat, 50)
 
-      this.document.timer = 42
+      this.payload.timer = 42
     },
-    'document.text'(value) {
-      this.document.timer = 42
+    'payload.text'(value) {
+      this.payload.timer = 42
 
       if (this.dynamicValidation) {
-        clearTimeout(this.document.timer)
-        this.document.timer = setTimeout(this.validateDocument, 50)
+        clearTimeout(this.payload.timer)
+        this.payload.timer = setTimeout(this.validatePayload, 50)
       }
     }
   },
@@ -161,7 +161,7 @@ export default {
     <i-container>
     <i-nav class="_display:flex _justify-content:end">
       <i-nav-item
-        href="https://www.byteplug.io/standards/document-validator"
+        href="https://www.byteplug.io/standards/payload"
         class="_margin-right:1"
       >Official Website</i-nav-item>
     </i-nav>
@@ -170,11 +170,11 @@ export default {
     <div class="_flex-grow:1">
       <i-container class="_height:100% _display:flex _flex-direction:column">
         <div class="_width:75%">
-          <h4>JSON Document Validator</h4>
+          <h4>Payload Validator</h4>
           <div class="_margin-bottom:3">
-Toy around with the Document Validator standard. On the left you enter the YAML
-specifications of your JSON document, and on the right see how it validates (or
-invalidates) them.
+Toy around with the Payload standard. On the left you enter the YAML-based
+format (or specification) of your JSON payload, and on the right see how it
+validates (or invalidates) them.
           </div>
         </div>
         <i-row class="_flex-grow:1">
@@ -184,16 +184,16 @@ invalidates) them.
           >
             <div class="_display:flex _justify-content:space-between">
               <div class="_font-weight:bold _font-size:lg _margin-bottom:1">
-                YAML Specs
+                Format (YAML)
               </div>
               <div v-if="status === 'invalid'">
-                <warnings :warnings="specs.warnings"/>
-                <errors :errors="specs.errors"/>
+                <warnings :warnings="format.warnings"/>
+                <errors :errors="format.errors"/>
               </div>
             </div>
             <div class="_background:white _flex-grow:1">
               <codemirror
-                v-model="specs.text"
+                v-model="format.text"
                 :style="{ height: '100%' }"
                 :autofocus="true"
                 :indent-with-tab="true"
@@ -208,13 +208,14 @@ invalidates) them.
           >
             <div class="_display:flex _justify-content:space-between">
               <div class="_font-weight:bold _font-size:lg _margin-bottom:1">
-                JSON Document
+                Payload (
+                  JSON)
               </div>
               <div v-if="status === 'valid'">
-                <div v-if="document.timer != null"></div>
-                <div v-else-if="document.errors.length > 0 || document.warnings.length > 0">
-                  <warnings :warnings="document.warnings"/>
-                  <errors :errors="document.errors"/>
+                <div v-if="payload.timer != null"></div>
+                <div v-else-if="payload.errors.length > 0 || payload.warnings.length > 0">
+                  <warnings :warnings="payload.warnings"/>
+                  <errors :errors="payload.errors"/>
                 </div>
                 <div v-else>
                   <i-icon name="ink-check" class="_color:success" />
@@ -223,7 +224,7 @@ invalidates) them.
             </div>
             <div class="_background:white _flex-grow:1">
               <codemirror
-                v-model="document.text"
+                v-model="payload.text"
                 :style="{ height: '100%' }"
                 :autofocus="true"
                 :indent-with-tab="true"
@@ -264,7 +265,7 @@ invalidates) them.
             <i-button
               class="_margin-left:1"
               color="primary"
-              @click="validateDocument"
+              @click="validatePayload"
               :disabled="status !== 'valid'">Validate</i-button>
           </div>
         </div>

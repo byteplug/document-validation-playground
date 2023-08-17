@@ -8,7 +8,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@byteplug/document": "^0.0.2",
+    "@byteplug/payload": "^0.0.3",
     "@codemirror/lang-json": "^6.0.0",
     "@codemirror/legacy-modes": "^6.1.0",
     "@codemirror/stream-parser": "^0.19.9",
